@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { UpsertMaterializedAlarmRepository } from 'src/alarms/application/ports/upsert-materialized-alarm.repository';
 import { AlarmCreatedEvent } from 'src/alarms/domain/events/alarm-created.event';
-import type { SerializedEventPayload } from 'src/shared/domain/interfaces/serializeble-event';
+import type { SerializedEventPayload } from 'src/shared/domain/interfaces/serializable-event';
 
 @EventsHandler(AlarmCreatedEvent)
 export class AlarmCreatedEventHandler

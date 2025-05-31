@@ -1,6 +1,8 @@
 import { DynamicModule, Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
+import { AcknowledgedAlarmCommandHandler } from 'src/alarms/application/commands/acknowledge-alarm.command-handler';
 import { CreateAlarmCommandHandler } from 'src/alarms/application/commands/create-alarm.command-handler';
+import { AlarmAcknowledgeEventHandler } from 'src/alarms/application/event-handlers/alarm-acknowledged.event-handler';
 import { AlarmCreatedEventHandler } from 'src/alarms/application/event-handlers/alarm-created.event-handler';
 import { GetAlarmsQueryHandler } from 'src/alarms/application/queries/get-alarms.query-handler';
 import { AlarmFactory } from 'src/alarms/domain/factories/alarm.factory';
@@ -16,6 +18,8 @@ import { AlarmsService } from './alarms.service';
     CreateAlarmCommandHandler,
     GetAlarmsQueryHandler,
     AlarmCreatedEventHandler,
+    AcknowledgedAlarmCommandHandler,
+    AlarmAcknowledgeEventHandler,
   ],
 })
 export class AlarmsModule {

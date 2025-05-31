@@ -2,19 +2,37 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EVENT_STORE_CONNECTION } from 'src/core/core.constants';
-import { SerializedEvent } from 'src/shared/domain/interfaces/serializeble-event';
+import { EventStore } from 'src/shared/application/ports/event-store';
+import { SerializableEvent } from 'src/shared/domain/interfaces/serializable-event';
+import { EventDeserializer } from 'src/shared/infrastructure/event-store/deserializers/event.deserializer';
+import { Event } from 'src/shared/infrastructure/event-store/schemas/event.schema';
 
 @Injectable()
-export class MongoEventStore {
+export class MongoEventStore implements EventStore {
   private readonly logger = new Logger(MongoEventStore.name);
 
   constructor(
     @InjectModel(Event.name, EVENT_STORE_CONNECTION)
     private readonly eventStore: Model<Event>,
+    private readonly eventDeserializer: EventDeserializer,
   ) {}
 
+  async getEventsByStreamId(streamId: string): Promise<SerializableEvent[]> {
+    const events = await this.eventStore
+      .find({ streamId })
+      .sort({ position: 1 });
+
+    if (events.length === 0) {
+      throw new Error(`Aggregate with id ${streamId} does not exist`);
+    }
+
+    return events.map((event) =>
+      this.eventDeserializer.deserialize(event.toJSON() as Event),
+    );
+  }
+
   async persist(
-    eventOrEvents: SerializedEvent | SerializedEvent[],
+    eventOrEvents: SerializableEvent | SerializableEvent[],
   ): Promise<void> {
     const events = Array.isArray(eventOrEvents)
       ? eventOrEvents
